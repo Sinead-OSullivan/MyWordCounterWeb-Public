@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>My Word Counter</title>
+        <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="mywordcounter.css">
+        
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="mywordcounter.js"></script>
+    </head>
+    <body>
+        
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="logIn.html" id="logOutButton">Log In</a></li>
+                <li class="header-list header-button"><a href="sign_up.html">Sign Up</a></li>
+                <li class="header-list header-button"><a href="download.html">Get App</a></li>
+                <li class="header-list header-button"><a href="index.html">Home</a></li>
+            </ul>
+            
+        </header>
+           
+        <section class="logged_in home-logged-in cover-page">
+            <h1>Welcome to My Word Counter</h1>
+            <p>Many children suffer from Developmental Language Disorder (DLD), 
+                which is associated with poor literacy skills in later life, limited employment opportunities, 
+                and mental health problems. Effective treatment for DLD exists, but accurately assessing 
+                individual needs presents problems. The current standard test involves counting the number 
+                of words a child learns over a given period of therapy. Research suggests that other variables
+                 should be taken into account 
+                e.g. how many times a child was exposed to a word before learning its meaning.</p>
+                <p>My Word Counter is an app that will record a child speaking target words during therapeutic
+                     activities. The app is able either to count the total number of utterances of the words 
+                     and alert the users when a predefined total or time limit has been reached. 
+                     Data gathered by the app is stored in a database, with provision for therapists 
+                     to search and view the results.</p>
+                <h2>Get started:</h2>
+                <ul class="nav-list ">
+                    <li class="header-list">
+                        <a href="sign_up.html" class="gradient-btn ">Make a Therapist or Researcher account</a>
+                    </li>
+                    <li class="header-list">
+                        <a href="download.html" class="gradient-btn ">Download the app</a>
+                    </li>
+                <ul></ul>
+        </section>
+    </body>

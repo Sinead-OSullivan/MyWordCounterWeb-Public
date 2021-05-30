@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>My Account | My Word Counter</title>
+        <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="../mywordcounter.css">
+
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="../mywordcounter.js"></script>
+    </head>
+    
+
+    <body>
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="../assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="#" id="logOutButton">Log Out</a></li>
+                <li class="header-list header-button"><a href="account_data.html">My Account</a></li>
+                <li class="header-list header-button"><a href="client/clients.html">Clients</a></li>
+                <li class="header-list header-button"><a href="sessions/sessions.html">Sessions</a></li>
+                <li class="header-list header-button"><a href="home.html">Home</a></li>
+            </ul>
+            
+        </header>
+        <section id="loading" class="logged_in"><h2 >Loading...</h2></section>
+        <section class = "logged_in" id="main" style="visibility:hidden;">
+            <h1 class="table-title" id="t_name"></h1></h1>
+            <table class="details">
+                <tr><td class="details"><b>Public ID:</b></td><td class="details" id="pid"></td></tr>
+                <tr><td class="details"><b>Email:</b></td><td class="details" id="emailAddress"></td></tr>
+            </table>
+            <a href="edit_account_data.html" id="edit_therapist" class="edit-btn" >Edit</a>
+            <button id="delete_account" class="edit-btn cancel-btn" >Delete Account</button>
+
+         
+        </section>
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>         
+        
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                // Removed database details in public repo for security
+            };
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+         }else {
+            firebase.app(); // if already initialized, use that one
+         }
+         firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        uid = user.uid;
+                        currentUser = new CurrentUser();
+                        currentUser.setData(user, uid);
+                        console.log(currentUser);
+                        checkUserData();
+                    } 
+                    else {
+                        window.location.replace('../logIn.html');
+                    }
+            });
+
+            function checkUserData(){
+                    if (currentUser.fname == "none"){
+                        setTimeout(checkUserData, 300); // try again in 300 milliseconds
+                    }
+                    else {
+                        console.log(currentUser.fname + " data has loaded")
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("main").style.visibility = "visible";
+                            setUpAccountData(currentUser);
+                    }
+                }
+
+            function setUpAccountData(currentUser){
+
+                var db = firebase.firestore();
+                                
+                // get basic user data
+                var docRef = db.collection("users").doc(currentUser.uid);
+                docRef.get().then(function(doc) {
+                    if (doc.exists) {
+                        console.log("Document data:", doc.data());
+                        document.getElementById("t_name").innerHTML = doc.data().fname + " " + doc.data().sname;
+                        document.getElementById("pid").innerHTML =  doc.data().publicID;  //emailAddress
+                        document.getElementById("emailAddress").innerHTML =   doc.data().email;  
+
+                        
+                    } else {
+                        // doc.data() will be undefined in this case
+                        console.log("No such document!");
+                    }
+                }).catch(function(error) {
+                    console.log("Error getting document:", error);
+                });
+
+                
+            }
+
+            $("#logOutButton").click(function(){
+                        logOut();
+                    })
+            
+            $("#delete_account").click(function(){
+                // Prompt the user to re-provide their sign-in credentials
+                var oldPassword = prompt("Please enter your current password to proceed with deleting your account");
+                var uid = currentUser.uid;
+                if (oldPassword != null && oldPassword != "") {
+                        console.log(currentUser.email);
+                        // use to authenticate the user
+                        firebase.auth().signInWithEmailAndPassword(currentUser.email, oldPassword)
+                            .then((userCredential) => {
+                                const cred = firebase.auth.EmailAuthProvider.credential(
+                                    currentUser.email,
+                                    oldPassword
+                                )
+                                firebase.auth().currentUser.reauthenticateWithCredential(cred).then(function() {
+                                // User re-authenticated.
+                                var user = firebase.auth().currentUser;
+                                user.delete().then(function() {
+                                    alert("Account deleted sucessfully")
+
+                                    db.collection("users").doc(uid).delete().then(() => {
+                                        console.log("Document successfully deleted!");
+                                    }).catch((error) => {
+                                        console.error("Error removing document: ", error);
+                                    });
+                                    
+                                    var batch1 = db.batch();
+                                    // reset clients' assigned_therapist
+                                    db.collection("users").where("assigned_therapist", "==", uid)
+                                    .where("userType", "==", "client")
+                                    .get().then(function(querySnapshot) {
+                                        querySnapshot.forEach(function(doc) {
+                                            console.log(doc.data().uid);
+                                            var ref = db.collection("users").doc(doc.data().uid);
+                                            batch1.update(ref, {"assigned_therapist": "none"}); //ToDo: set to none
+                                        });
+
+                                        batch1.commit().then(() => {
+                                            console.log("Updated clients");
+                                        });
+
+                                    });
+                                    window.location.replace('../logIn.html');
+                                }).catch(function(error) {
+                                    alert("Could not delete account");
+                                    console.log(error);
+                                });
+                              
+                            }).catch(function(error) {
+                                alert("Unable to authenticate: cannot delete account");
+                                    console.log(error);
+                            });
+
+                            })
+                            .catch((error) => {
+                                alert("Unable to authenticate: cannot delete account");
+                                console.log(error);
+                            });
+
+                        }
+            })
+        </script> 
+
+       </body>
+</html>

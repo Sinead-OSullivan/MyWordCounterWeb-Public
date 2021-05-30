@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Home | My Word Counter</title>
+        <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="../mywordcounter.css"><link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        
+        <script src="../mywordcounter.js"></script>
+    </head>
+    <body>
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="../assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="#" id="logOutButton">Log Out</a></li>
+                <li class="header-list header-button"><a href="account_data.html">My Account</a></li>
+                <li class="header-list header-button"><a href="client/clients.html">Clients</a></li>
+                <li class="header-list header-button"><a href="sessions/sessions.html">Sessions</a></li>
+                <li class="header-list header-button"><a href="home.html">Home</a></li>
+            </ul>
+            
+        </header>
+        <section id="loading" class="logged_in home-logged-in"><h1>Loading...</h1></section>
+        <section class = "logged_in home-logged-in" id="main" style="visibility:hidden;">
+            <h2 id="welcome_h2"></h2>
+            <ul class="nav-list section-list">
+                <li class="section-list gradient-btn"><a href="account_data.html">View Account Data</a></li>
+                <li class = "section-list gradient-btn"><a href="client/clients.html">View Clients</a></li>
+                <li class = "section-list gradient-btn"><a href="sessions/sessions.html">View Sessions</a></li>
+            </ul>
+        </section>
+
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>
+
+               
+    <script>
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                uid = user.uid;
+                currentUser = new CurrentUser();
+                currentUser.setData(user, uid);
+                console.log(currentUser);
+                checkUserData();
+            } 
+            else {
+                window.location.replace('../logIn.html');
+            }
+            });
+
+            function checkUserData(){
+                if (currentUser.fname == "none"){
+                    setTimeout(checkUserData, 300); // try again in 300 milliseconds
+                }
+                else {
+                    console.log(currentUser.fname + " data has loaded")
+                    document.getElementById("welcome_h2").innerHTML = "Welcome "+currentUser.fname;
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("main").style.visibility = "visible";
+                }
+            }
+
+            $("#logOutButton").click(function(){
+                logOut();
+            })
+            
+    </script>
+
+       </body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Sign Up | My Word Counter</title>
+        <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="mywordcounter.css">
+        
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="mywordcounter.js"></script>
+    </head>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+      https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+    <body >
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="logIn.html" id="logOutButton">Log In</a></li>
+                <li class="header-list header-button"><a href="sign_up.html">Sign Up</a></li>
+                <li class="header-list header-button"><a href="download.html">Get App</a></li>
+                <li class="header-list header-button"><a href="index.html">Home</a></li>
+            </ul>
+            
+        </header>
+           
+        <section class="logged_in home-logged-in">
+            <h1>Make a Therapist or Researcher account:</h1>
+            <form >
+                <!-- autogenerate: uid-->
+                <input style="max-width: 50%;" type="text" id="fname" name="fname" placeholder="First Name" required><br>
+                <input style="max-width: 50%;" type="text" id="sname" name="sname" placeholder="Surname" required><br>
+                <input style="max-width: 50%;" type="text" id="email" name="email" placeholder="Email Address" required><br>
+                <input style="max-width: 50%;" type="password" id="password" name="password" placeholder="Password" required><br>
+                <button value="signUp" id="signUp" class="gradient-btn">Sign Up</button>
+            </form> 
+            <p class="smallLink"> Already have an account?<a href="logIn.html" class="smallLink" style="display: inline;"> Log in</a></p>
+
+            
+        </section>
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>         
+        
+
+        <script>
+
+            var currentUser;
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+               // Removed database details in public repo for security
+            };
+            if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+         }else {
+            firebase.app(); // if already initialized, use that one
+         }
+            var db = firebase.firestore();
+            
+            $("#signUp").click(function(){
+                event.preventDefault();
+                var fname = $("#fname")[0].value.trim();
+                var sname = $("#sname")[0].value.trim();
+                var email = $("#email")[0].value.trim();
+                var password = $("#password")[0].value.trim();
+
+                //alert(fname + sname + admin);
+                if (validateSignUpForm(fname, sname, email) == true){
+                    sign_up(db, fname, sname, email, password);
+                }
+                
+            });
+
+            function generate_public_id(db, newUser, fname, sname, email){
+                id = "";
+                char_options = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                for (i=0;i<20;i++){
+                    id = id + char_options.charAt(getRndInteger(0, (char_options.length-1)))
+                }
+                console.log(id);
+                // check to make sure this id is not already in use:
+                var docRef = db.collection("public_ID").doc("public_ID");
+                docRef.get().then(function(doc) {
+                    if (doc.data().public_ID.includes(id)) {
+                        return generate_public_id(db, newUser);
+                    } else {
+
+                        saveAccountData(db, newUser, fname, sname, id, email)
+                    }
+                }).catch(function(error) {
+                    console.log("Error generating id:", error);
+                    newUser.delete();
+                });
+            }
+
+            
+            function sign_up(db, fname, sname, email, password){
+                try {
+                        firebase.auth().createUserWithEmailAndPassword(email, password).then(function(firebaseUser) {
+                        // set up database info:
+                        firebase.auth().onAuthStateChanged(function(newUser) {
+                            if (newUser) {
+                                publicID = generate_public_id(db, newUser, fname, sname, email);
+                           
+                            } else {
+                                alert("error creating new user");
+                            }
+                        });
+                    });
+                } catch (error) {
+                    alert("error creating new user");
+                }
+                
+                
+            }
+
+            function saveAccountData(db, newUser, fname, sname, publicID, email){
+                db.collection("users").doc(newUser.uid).set({
+                    uid: newUser.uid,
+                    fname: fname,
+                    sname: sname,
+                    publicID: publicID,
+                    userType: "therapist",
+                    email: email,
+                }).then(function(){
+                    window.location.replace('user/home.html');
+                })
+                .catch(function(error) {
+                    newUser.delete();
+                    console.log(error);
+                    alert("Error setting up account", error);
+                    window.location.replace('logIn.html');
+                }); 
+            }
+        </script>
+
+       </body>
+</html>

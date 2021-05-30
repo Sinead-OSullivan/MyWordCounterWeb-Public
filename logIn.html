@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Log In | My Word Counter</title>
+        <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="mywordcounter.css">
+        
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="mywordcounter.js"></script>
+    </head>
+    <body >
+        
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="logIn.html" id="logOutButton">Log In</a></li>
+                <li class="header-list header-button"><a href="sign_up.html">Sign Up</a></li>
+                <li class="header-list header-button"><a href="download.html">Get App</a></li>
+                <li class="header-list header-button"><a href="index.html">Home</a></li>
+            </ul>
+            
+        </header>
+           
+        <section class="logged_in home-logged-in">
+           
+            <input style="max-width: 50%;" type="text" id="fname" name="fname" placeholder="Username"><br>
+           
+            <input style="max-width: 50%;" type="password" id="password" name="password" placeholder="Password" ><br><br>
+            <input type="submit" value="Log In" id="logIn" class="gradient-btn">
+            <a id="forgot" class="smallLink">forgotten password?</a>
+        </section>
+        
+    
+ <!-- Add Firebase products that you want to use -->
+ <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>
+
+        <script>
+           
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                // removed for security
+            };
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }else {
+                firebase.app(); // if already initialized, use that one
+            }
+
+            firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = new CurrentUser();
+                uid = user.uid;
+                currentUser.setData(user, uid);
+                checkUserData();
+            } 
+            });
+            
+            $("#logIn").click(function(){
+                event.preventDefault();
+                var email = $("#fname")[0].value.trim(); 
+                var password = $("#password")[0].value.trim();
+                
+                firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                })
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    alert(errorMessage);
+                });
+                })
+
+            function checkUserData(){
+                if (currentUser.fname == "none"){
+                    setTimeout(checkUserData, 300); // try again in 300 milliseconds
+                }
+                else {
+                    console.log(currentUser.fname + " data has loaded")
+                    window.location.replace('user/home.html');
+                }
+            }
+            
+           // ToDo: sign up, forgotten password
+           $("#forgot").click(function(){
+                var email = prompt("Please enter your email address and we will send you an email that will allow you to reset your password");
+                firebase.auth().sendPasswordResetEmail(email).then(function() {
+                    alert("Email sent!")
+                }).catch(function(error) {
+                    alert("Unable to send email to this address")
+                });
+           })
+        </script>
+    
+    </body>
+</html>

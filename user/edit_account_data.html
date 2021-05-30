@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Edit My Account | My Word Counter</title>
+        <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="../mywordcounter.css">
+        
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="../mywordcounter.js"></script>
+    </head>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+      https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+    <body>
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="../assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="#" id="logOutButton">Log Out</a></li>
+                <li class="header-list header-button"><a href="account_data.html">My Account</a></li>
+                <li class="header-list header-button"><a href="client/clients.html">Clients</a></li>
+                <li class="header-list header-button"><a href="sessions/sessions.html">Sessions</a></li>
+                <li class="header-list header-button"><a href="home.html">Home</a></li>
+            </ul>
+            
+        </header>
+
+        <section id="loading" class="logged_in"><h2 >Loading...</h2></section>
+        <section class = "logged_in" id="main" style="visibility:hidden;">
+            <h1 class="table-title">Edit Account Data</h1>
+            <form >
+                <!-- autogenerate: uid-->
+                <input type="text" id="fname" name="fname" placeholder="First Name" required><br>
+                <input type="text" id="sname" name="sname" placeholder="Surname" required><br>
+                <input type="text" id="email" name="email" placeholder="Email Address" required><br>
+                <input type="text" id="password" name="password" placeholder="Password"><br>
+                <button value="edit" id="edit" class="edit-btn">Save Changes</button>
+                <a value="edit" id="edit" class="edit-btn cancel-btn" href="account_data.html">Cancel</a>
+
+            </form> 
+            
+        </section>
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>         
+        
+
+        <script>
+
+            var currentUser;
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                // Removed database details in public repo for security
+            };
+            if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+         }else {
+            firebase.app(); // if already initialized, use that one
+         }
+            var db = firebase.firestore();
+
+            firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        uid = user.uid;
+                        currentUser = new CurrentUser();
+                        currentUser.setData(user, uid);
+                        console.log(currentUser);
+                        checkUserData();
+                    } 
+                    else {
+                        window.location.replace('../../logIn.html');
+                    }
+            });
+
+            function checkUserData(){
+                    if (currentUser.fname == "none"){
+                        setTimeout(checkUserData, 300); // try again in 300 milliseconds
+                    }
+                    else {
+                        console.log(currentUser.fname + " data has loaded")
+                        document.getElementById("loading").style.display = "none";
+                        document.getElementById("main").style.visibility = "visible";
+                        var therapist_id = currentUser.uid;
+                        // get basic user data
+                        var docRef = db.collection("users").doc(therapist_id);
+                        docRef.get().then(function(doc) {
+                            if (doc.exists) {
+                                console.log("Document data:", doc.data());
+                                document.getElementById("fname").value = doc.data().fname;
+                                document.getElementById("sname").value = doc.data().sname;
+                                
+                                
+                                if (doc.data().email){
+                                    document.getElementById("email").value =  doc.data().email; 
+                                } else {
+                                    //pass
+                                }
+                            } else {
+                                // doc.data() will be undefined in this case
+                                console.log("No such document!");
+                            }
+                        }).catch(function(error) {
+                            console.log("Error getting document:", error);
+                        });
+
+                    } 
+                }
+
+
+            
+
+            $("#edit").click(function(){
+                event.preventDefault();
+                var fname = $("#fname")[0].value.trim();
+                var sname = $("#sname")[0].value.trim();
+                var email = $("#email")[0].value.trim();
+                var password = $("#password")[0].value.trim();
+
+                //alert(fname + sname + admin);
+                if (validateEditForm(fname, sname, email) == true){
+                    edit_therapist(db, fname, sname, email, currentUser.uid, password);
+                }
+                
+            });
+
+            $("#logOutButton").click(function(){
+                        logOut();
+                    })
+            
+            function edit_therapist(db, fname, sname, email, uid, password){
+                console.log(password);
+                var therapist_data = {
+                    "fname": "",
+                    "sname": "",
+                    "email": "",
+                }
+
+                therapist_data["fname"] = fname;
+                therapist_data["sname"] = sname;
+                therapist_data["email"] = email;
+                
+                if (password != "" && password != null){
+
+                    var user = firebase.auth().currentUser;
+
+                    // Prompt the user to re-provide their sign-in credentials
+                    var oldPassword = prompt("Please enter your current password to proceed");
+                    if (oldPassword != null && oldPassword != "") {
+                        // use to authenticate the user
+                        firebase.auth().signInWithEmailAndPassword(email, oldPassword)
+                            .then((userCredential) => {
+                                const cred = firebase.auth.EmailAuthProvider.credential(
+                                    email,
+                                    oldPassword
+                                )
+                                user.reauthenticateWithCredential(cred).then(function() {
+                                // User re-authenticated.
+                                var user = firebase.auth().currentUser;
+                                user.updatePassword(password).then(function() {
+                                    db.collection("users").doc(uid).update({
+                                        fname: therapist_data["fname"],
+                                        sname: therapist_data["sname"],
+                                        email: therapist_data["email"]
+                                    })
+                                    .then(function() {
+                                        alert("Account data updated sucessfully!");
+                                        window.location.replace('account_data.html');
+                                    })
+                                    .catch(function(error) {
+                                        alert("Password was changed, but an error occured when saving the rest of the data");
+                                        
+                                    });
+                                }).catch(function(error) {
+                                    alert("Unable to update account data");
+                                    console.log(error);
+                                });
+                            }).catch(function(error) {
+                                alert("Unable to authenticate: cannot update account data");
+                                    console.log(error);
+                            });
+
+                            })
+                            .catch((error) => {
+                                alert("Unable to authenticate: cannot update account data");
+                                console.log(error);
+                            });
+
+                        
+
+
+                    }
+
+                } else {
+                    db.collection("users").doc(uid).update({
+                            fname: therapist_data["fname"],
+                            sname: therapist_data["sname"],
+                            email: therapist_data["email"]
+                        })
+                        .then(function() {
+                            alert("Account data updated sucessfully!");
+                            window.location.replace('account_data.html');
+                        })
+                        .catch(function(error) {
+                            alert("An error occured when updating account data");
+                        });
+                }
+                
+                
+
+               
+                
+            }
+        </script>
+
+       </body>
+</html>

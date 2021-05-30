@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Sessions | My Word Counter</title>
+        <link rel="shortcut icon" href="../../assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="../../mywordcounter.css">    </head>
+        
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="../../mywordcounter.js"></script>
+    <body>
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img src="../../assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a id="logOutButton" href="">Log Out</a></li>
+                <li class="header-list header-button"><a href="../account_data.html">My Account</a></li>
+                <li class="header-list header-button"><a href="../client/clients.html">Clients</a></li>
+                <li class="header-list header-button"><a href="sessions.html">Sessions</a></li>
+                <li class="header-list header-button"><a href="../home.html">Home</a></li>
+            </ul>
+            
+        </header>
+        <section id="loading" class="logged_in home-logged-in"><h1>Loading...</h1></section>
+        <section class = "logged_in" id="main" style="visibility:hidden;">
+            <h1 class="table-title">All Sessions</h1>
+            
+            <table id="sessionTable" class="display" width="100%"></table>
+        </section>
+
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>
+
+               
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+           // Removed database details in public repo for security
+        };
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }else {
+        firebase.app(); // if already initialized, use that one
+    }
+
+    var dataSet = [];
+
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            uid = user.uid;
+            currentUser = new CurrentUser();
+            currentUser.setData(user, uid);
+            console.log(currentUser);
+            checkUserData();
+        } 
+        else {
+            window.location.replace('../../logIn.html');
+        }
+        });
+
+    function checkUserData(){
+        if (currentUser.fname == "none"){
+            setTimeout(checkUserData, 300); // try again in 300 milliseconds
+        }
+        else {
+            console.log(currentUser.fname + " data has loaded")
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("main").style.visibility = "visible";
+            getSessionsForResearchTable();
+        
+        }
+    }
+
+    function getSessionsForResearchTable(){ 
+    dataSet = [];
+    var sessionConverter = {
+        toFirestore: function(client) {
+            return {
+                name: session.name,
+                session_id: session.session_id,
+                words: session.words,
+                session_end: session.session_end,
+                time_lim: session.time_lim,
+                req_word_count: session.req_word_count,
+                completed_by: session.completed_by,
+                word_count: session.word_count,
+                time_taken: session.time_taken,
+                date_recorded: session.date_recorded,
+                time_recorded: session.time_recorded,
+                age_of_client: session.age_of_client,
+                notes_after: session.notes_after,
+                notes_before: session.notes_before,
+                public_id: session.public_id,
+            }
+        },
+        fromFirestore: function(snapshot, options){
+            const data = snapshot.data(options);
+            return new clientSession(data.name, data.session_id, data.words, data.session_end, data.time_lim, 
+                data.req_word_count, data.completed_by, data.word_count,
+                data.time_taken, data.date_recorded, data.time_recorded, data.age_of_client, 
+                data.notes_after, data.notes_before, data.public_id)
+            }
+        }
+
+        db.collection("completed_sessions")
+        .withConverter(sessionConverter)
+        .get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            var session = doc.data();
+            dataSet.push(session.toTableDataResearcher());
+        });
+        var table = $('#sessionTable').DataTable( {
+                data: dataSet,
+                columns: [
+                    { title: "Name" },
+                    { title: "Words" },
+                    { title: "Word Count" },
+                    { title: "Time taken" },
+                    {title: "Date recorded"},
+                    {title: "Time Recorded"},
+                    {title: "Client ID"},
+                    { title: "Client Age" },
+                    {title: ""}
+                ]
+            } );
+
+        
+    });
+}
+
+        $("#logOutButton").click(function(){
+            logOut();
+        })
+            
+    </script>
+
+       </body>
+</html>

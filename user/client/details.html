@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Clients | My Word Counter</title>
+        <link rel="shortcut icon" href="../../assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="../../mywordcounter.css">
+
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="../../mywordcounter.js"></script>
+    </head>
+    
+
+    <body>
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="../../assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="#" id="logOutButton">Log Out</a></li>
+                <li class="header-list header-button"><a href="../account_data.html">My Account</a></li>
+                <li class="header-list header-button"><a href="clients.html">Clients</a></li>
+                <li class="header-list header-button"><a href="../sessions/sessions.html">Sessions</a></li>
+                <li class="header-list header-button"><a href="../home.html">Home</a></li>
+            </ul>
+            
+        </header>
+        <section id="loading" class="logged_in"><h2 >Loading...</h2></section>
+        <section class = "logged_in" id="main" style="visibility:hidden;">
+            <h1 class="table-title" id="t_name"></h1></h1>
+            <table class="details">
+                <tr><td class="details"><b>Date of Birth:</b></td><td class="details" id="dob"></td></tr>
+                <tr><td class="details"><b>ID:</b></td><td class="details" id="uid"></td></tr>
+            </table>
+            <ul class="nav-list ">
+                    <li><button id="remove_client" class="table-btn">Remove as Client</button></li>
+                    <!--ToDo: functionality-->
+                </ul> 
+            <section id="assigned_sessions" class="sub-table">
+                <h2 class="details-title">Completed sessions</h2>
+                <table id="sessionTable" class="display" width="100%"></table>
+            </section>
+           
+        </section>
+        <!-- Add Firebase products that you want to use -->
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>         
+        
+        <script>
+
+            
+        var url_string = window.location.href;
+            var url = new URL(url_string);
+            var client_id = url.searchParams.get("u");
+
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyAy6r9FoBeBJvGpvQ37EztLu8GAx614IL8",
+                authDomain: "my-word-counter-3b05d.firebaseapp.com",
+                projectId: "my-word-counter-3b05d",
+                storageBucket: "my-word-counter-3b05d.appspot.com",
+                messagingSenderId: "235351180433",
+                appId: "1:235351180433:web:72eab8b2b6e561525c6b30"
+            };
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+         }else {
+            firebase.app(); // if already initialized, use that one
+         }
+         firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        uid = user.uid;
+                        currentUser = new CurrentUser();
+                        currentUser.setData(user, uid);
+                        console.log(currentUser);
+                        checkUserData();
+                    } 
+                    else {
+                        window.location.replace('../../logIn.html');
+                    }
+            });
+
+            function checkUserData(){
+                    if (currentUser.fname == "none"){
+                        setTimeout(checkUserData, 300); // try again in 300 milliseconds
+                    }
+                    else {
+                        console.log(currentUser.fname + " data has loaded")
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("main").style.visibility = "visible";
+                    }
+                }
+
+            var db = firebase.firestore();
+        
+
+                 
+            // get basic user data
+            var docRef = db.collection("users").doc(client_id);
+            docRef.get().then(function(doc) {
+                if (doc.exists) {
+                    if(doc.data().assigned_therapist != currentUser.uid){
+                        window.location.replace('clients.html');
+                    }
+                    //console.log("Document data:", doc.data());
+                    document.getElementById("t_name").innerHTML = doc.data().fname + " " + doc.data().sname;
+                    document.getElementById("dob").innerHTML = doc.data().dob
+                    document.getElementById("uid").innerHTML = doc.data().publicID;  
+                    
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                }
+            }).catch(function(error) {
+                console.log("Error getting document:", error);
+            });
+
+            getSessionsForTable(client_id, "true");
+        
+
+            $("#logOutButton").click(function(){
+                        logOut();
+                    })
+
+            $("#remove_client").click(function(){
+                event.preventDefault();
+                var r = confirm("Are you sure you want to remove this user as your therapist? You will no longer be able to see their data");
+                if (r == true) {
+                    remove_client(client_id);
+                        
+                }
+            })
+        </script> 
+
+       </body>
+</html>

@@ -1,0 +1,424 @@
+/*general css*/
+:root {
+    --main-color: #0e4fa6;
+    --text-black: black;
+    --text-white: white;
+    --body-background: white;
+    --gradient-blue: #5ce1e6;
+    --gradient-green: #7ed957;
+    --bg-gray: rgb(133, 133, 133);
+    --red-color: rgb(231, 55, 55);
+    --form-gray: rgb(59, 59, 59);
+  }
+
+:root {
+    background: var(--gradient-green) no-repeat center center fixed;
+    background: linear-gradient(0deg, var(--gradient-green) 0%, var(--gradient-blue) 100%);
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100%;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    background-attachment: fixed;
+}
+
+body p{
+    padding: 0.5em
+}
+
+.gradient-btn {
+    background-color: var(--main-color);
+    border: none;
+    color: var(--text-white);
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.35em;
+    border-radius: 1em;
+    background: linear-gradient(45deg, var(--gradient-green) 0%, var(--gradient-blue) 100%);
+    font-weight: 700;
+    margin: 0.5em 0em;
+
+}
+
+.gradient-btn:hover {
+    text-decoration: underline;
+}
+
+.gradient-btn:focus {
+    border: 0px solid white;
+    outline: none;
+}
+
+.gradient-btn a{
+    color: var(--text-white);
+    text-decoration: none;
+}
+
+.gradient-btn a:hover{
+    text-decoration: underline;
+}
+
+.gradient-btn a:visited{
+    color: var(--text-white)
+}
+
+/* Log in page: ------------------------------------------------------------- */
+  #header_logIn {
+    margin-bottom: 3em;
+}
+
+body.log_in {
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--body-background);
+    padding: 6em;
+    width: 50%;
+    height: 50%
+}
+
+.smallLink{
+    color: var(--form-gray);
+    text-decoration: none;
+    margin: 0.5em 0em 2em 0em;
+    display: block;
+    font-size: 0.95em;
+
+}
+
+.smallLink:hover {
+    text-decoration: underline;
+}
+
+.smallLink:focus {
+    border: 0px solid white;
+    outline: none;
+}
+
+smallLink:visited{
+    color: var(--form-gray);
+}
+
+/* Forms --------------------------------------- */
+
+input[type=text], input[type=password], input[type=date] {
+    width: 80%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 0.2em solid var(--gradient-blue);
+   
+  }
+
+  input[type=text]:focus, input[type=password]:focus, input[type=text]:focus, input[type=date]:focus {
+    outline: none;
+    border-bottom: 0.2em solid var(--gradient-green);
+    outline: none;
+
+  }
+
+  input[type=date]{
+      width: 50%;
+  }
+
+  *:focus {
+    outline: none;
+}
+
+  .custom-select {
+    background-color: var(--text-white);
+    color: var(--form-gray);
+    border-width: 0.2em;
+    border-color: var(--gradient-blue);
+    border-radius: 1em;
+  }
+
+  .custom-select:focus {
+    border: 0px solid var(--gradient-green);
+    background-color: var(--text-white);
+    color: var(--form-gray);
+    border-width: 0.2em;
+    border-color: var(--gradient-green);
+    border-radius: 1em;
+  }
+
+  .custom-select option {
+      background-color: var(--text-white);
+      color: var(--form-gray);
+  }
+
+  .custom-select option:focus {
+    background-color: var(--gradient-green);
+    color: var(--text-black);
+    background-color: red;;
+}
+
+.form-div {
+    padding: 1em 1em 2em 1em;
+    color: var(--form-gray);
+}
+
+.form-table{
+    margin: auto;
+    text-align: center;
+}
+
+.form-table th, .table-table th{
+    border-bottom: 2px solid var(--gradient-green);
+}
+
+.table-table{
+    margin-top: 1em;
+}
+
+.form-input{
+    width: 50%;
+}
+
+  /* Logged in general -----------------------------------*/
+
+.logged_in {
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--body-background);
+    
+  }
+
+  ul.nav-list{
+    list-style-type: none;
+    margin: 0;
+    padding-right: 1em;
+    padding-left: 1em;
+    padding-top: 0.5em;
+    overflow: hidden;
+}
+
+ul.nav-list li{
+    display: inline;
+    padding: 1em;
+    background-color: var(--body-background);
+    font-weight: 700;
+    
+}
+
+/* Log-in header */
+#headerImgLogin {
+    margin: auto;
+    text-align: center;
+    max-width: 100%;
+    height: auto;
+
+}
+
+  /*Logged in Header  -------------------------- */
+
+header.logged_in {
+    padding: 0em;   
+    text-align: left;
+    width: 90%;
+}
+
+.header-img {
+    padding: 0em;
+    margin: 0em;
+    width: 25em;
+    max-width: 100%;
+    height: auto;
+}
+
+li.header-button {
+    float: right;
+    padding: 1em;
+    font-size: 1em;
+    color: var(--main-color);
+    margin-left: 1em;
+    margin-top: auto;
+    font-weight: 700;
+}
+
+li.header-button:hover {
+    text-decoration: underline;
+    color: var(--gradient-green)
+}
+
+ul.header-list li a{
+    text-decoration: none;
+}
+
+ul.header-list li a:hover{
+    text-decoration: none;
+}
+
+ul.header-list li a:visited{
+    color: var(--main-color);}
+
+  /*Logged in Section  -------------------------- */
+
+  section.logged_in {
+    padding: 6em;
+    padding-top: 2em;
+    margin-top: 2em;
+    width: 75%;
+    height: 100%;
+  }
+
+  section.home-logged-in{
+      padding: 0em;
+      width: 89%;
+      padding-top: 2em;
+      padding-bottom: 2em;
+  }
+
+  ul.section-list{
+      padding: 1em;
+  }
+
+  ul.section-list li {
+      margin: 0em 1em 0em 1em;
+  }
+
+  /* table stuff --------------------------------*/
+
+.table-btn {
+    background-color: var(--main-color);
+    border: none;
+    color: var(--text-white);
+    padding: 0.5em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.9em;
+    border-radius: 0.5em;
+}
+
+.delete-btn {
+    background-color: var(--red-color);
+}
+
+.more-btn {
+    background-color: var(--gradient-green);
+}
+
+.reset-btn {
+    background-color: var(--gradient-blue);
+}
+
+.add-btn {
+    float: left;
+    margin: 1em;
+}
+
+.table-title{
+    font-size: 3em;
+    padding: 0em;
+    margin: 0em;
+    margin-bottom: 1em;
+    color: var(--main-color);
+}
+
+.sub-table {
+    border-top: 0.2em solid var(--gradient-blue);
+    padding: 1em;
+    margin: 1em;
+}
+
+.buttons-row {
+    padding: 2em 0.5em;
+    display: inline;
+}
+
+.buttons-row button{
+    margin: 2em 0.5em;
+}
+
+.table-list {
+    text-align: left;
+}
+
+.table-link{
+    color: var(--form-gray);
+}
+
+
+/* more details page */
+.details-title{
+    font-size: 2em;
+    padding: 0em;
+    margin: 0em;
+    margin-bottom: 1em;
+    color: var(--text-black);
+}
+
+table.details {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom:1em
+}
+
+table.details td {
+    text-align: left;
+    padding-right: 0.5em
+}
+
+/* Account data section */
+
+.edit-btn {
+    background-color: var(--main-color);
+    border: none;
+    color: var(--text-white);
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 1em;
+    font-weight: 700;
+    margin: 1em;
+
+}
+
+.edit-btn:hover {
+    text-decoration: underline;
+}
+
+.edit-btn:focus {
+    border: 0px solid white;
+    outline: none;
+}
+
+.edit-btn a{
+    color: var(--text-white);
+    text-decoration: none;
+}
+
+.edit-btn a:hover{
+    text-decoration: underline;
+}
+
+.gradient-btn a:visited{
+    color: var(--text-white)
+}
+
+.cancel-btn {
+    background-color: var(--gradient-green);
+}
+
+/** new client div*/
+#addInputDiv{
+    padding: 2em;
+    display:block;
+    text-align: left;
+}
+
+.tsandcs{
+    color: var(--form-gray);
+    font-size: 0.8em;
+    margin-top: 0em;
+    padding-top:0em
+}

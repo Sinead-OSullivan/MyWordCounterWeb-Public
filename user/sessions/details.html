@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>Sessions| My Word Counter</title>
+        <link rel="shortcut icon" href="../../assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="../../assets/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="../../mywordcounter.css">
+
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="../../mywordcounter.js"></script>
+    </head>
+    
+
+    <body>
+
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img src="../../assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a id="logOutButton" href="">Log Out</a></li>
+                <li class="header-list header-button"><a href="../account_data.html">My Account</a></li>
+                <li class="header-list header-button"><a href="../client/clients.html">Clients</a></li>
+                <li class="header-list header-button"><a href="sessions.html">Sessions</a></li>
+                <li class="header-list header-button"><a href="../home.html">Home</a></li>
+            </ul>
+            
+        </header>
+    <section id="loading" class="logged_in"><h2 >Loading...</h2></section>
+    <section class = "logged_in" id="main" style="visibility:hidden;">
+        <h1 class="table-title" id="t_name"></h1></h1>
+        <table class="details">
+            <tr><td class="details"><b>Session ID:</b></td><td class="details" id="id"></td></tr>
+            <tr><td class="details"><b>Client Age:</b></td><td class="details" id="age"></td></tr>
+            <tr><td class="details"><b>Client ID:</b></td><td class="details" id="cid"></td></tr>
+            <tr><td class="details"><b>Time Taken:</b></td><td class="details" id="time_taken"></td></tr>
+            <tr><td class="details"><b>Time Recorded:</b></td><td class="details" id="time_recorded"></td></tr>
+            <tr><td class="details"><b>Date Recorded:</b></td><td class="details" id="date_recorded"></td></tr>
+            <tr><td class="details"><b>Words:</b></td><td class="details" id="words"></td></tr>
+        </table>
+        <h2>Additional Notes:</h2>
+        <p class="details"><b>Notes before the session was recorded: </b></p>
+        <p class="details" id="notes_before"></p>
+        <p class="details"><b>Notes after the session was recorded: </b></p>
+        <p class="details" id="notes_after"></p>
+        
+        
+    </section>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-firestore.js"></script>         
+    
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            // Removed database details in public repo for security
+        };
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        }else {
+        firebase.app(); // if already initialized, use that one
+        }
+        firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    uid = user.uid;
+                    currentUser = new CurrentUser();
+                    currentUser.setData(user, uid);
+                    console.log(currentUser);
+                    checkUserData();
+                } 
+                else {
+                    window.location.replace('../../logIn.html');
+                }
+        });
+
+        function checkUserData(){
+                if (currentUser.fname == "none"){
+                    setTimeout(checkUserData, 300); // try again in 300 milliseconds
+                }
+                else {
+                    console.log(currentUser.fname + " data has loaded")
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("main").style.visibility = "visible";
+                    dataSet = [];
+
+                   
+                }
+            }
+
+        var db = firebase.firestore();
+    
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var session_id = url.searchParams.get("id");
+            
+        // get basic user data
+        var docRef = db.collection("completed_sessions").doc(session_id);
+        docRef.get().then(function(doc) {
+            if (doc.exists) {
+                 // check that the user is the client's therapist:
+                    // get basic user data
+                    var docRef = db.collection("users").doc(doc.data().completed_by);
+                    docRef.get().then(function(doc) {
+                        if (doc.exists) {
+                            if(doc.data().assigned_therapist != currentUser.uid){
+                                window.location.replace('client_sessions.html');
+                            } 
+                            
+                        } else {
+                            // doc.data() will be undefined in this case
+                            console.log("No such document!");
+                            window.location.replace('client_sessions.html');
+                        }
+                    }).catch(function(error) {
+                        console.log("Error getting document:", error);
+                        window.location.replace('client_sessions.html');
+                    });
+                console.log("Document data:", doc.data());
+                document.getElementById("t_name").innerHTML = doc.data().name;
+                document.getElementById("id").innerHTML = doc.data().session_id
+                document.getElementById("time_taken").innerHTML = doc.data().time_taken;
+                document.getElementById("time_recorded").innerHTML = doc.data().time_recorded;
+                document.getElementById("date_recorded").innerHTML = doc.data().date_recorded;
+                document.getElementById("age").innerHTML = doc.data().age_of_client;
+                document.getElementById("cid").innerHTML = "<a class='table-link' href=../client/details.html?u="+doc.data().completed_by+">"+doc.data().public_id+"</a>";
+                document.getElementById("notes_before").innerHTML = doc.data().notes_before;
+                document.getElementById("notes_after").innerHTML = doc.data().notes_after;
+                wordLocation = document.getElementById("words");
+                var words = doc.data().words;
+                var table = wordLocation.appendChild(document.createElement('table'));
+                table.setAttribute("class", "table-table");
+                var f_row = table.appendChild(document.createElement('tr'));
+                var f_cell1 = f_row.appendChild(document.createElement('th'));
+                var f_cell2 = f_row.appendChild(document.createElement('th'));
+                f_cell1.innerHTML = "Word";
+                f_cell2.innerHTML = "Count";
+                for (i = 0; i<words.length; i++){
+                    var row = table.appendChild(document.createElement('tr'));
+                    var cell1 = row.appendChild(document.createElement('td'));
+                    var cell2 = row.appendChild(document.createElement('td'));
+                    cell1.innerHTML = words[i]+":";
+                    cell2.innerHTML = doc.data().word_count[i];  
+                }
+            }
+            }).catch(function(error) {
+                console.log("Error getting document:", error);
+            });
+        
+        $("#logOutButton").click(function(){
+                    logOut();
+                })
+    </script> 
+
+    </body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head >
+        <title>My Word Counter</title>
+        <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+        <link rel="stylesheet" href="mywordcounter.css">
+        
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.1.2/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+        <!-- jQuery Modal -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+        <script src="mywordcounter.js"></script>
+    </head>
+    <body>
+        
+        <header class = "logged_in">
+            <ul class="nav-list header-list">
+                <li class="header-list header-img"><img class="header-img" src="assets/My Word Counter (1).png" alt="word counter"></li>
+                <li class="header-list header-button"><a href="logIn.html" id="logOutButton">Log In</a></li>
+                <li class="header-list header-button"><a href="sign_up.html">Sign Up</a></li>
+                <li class="header-list header-button"><a href="download.html">Get App</a></li>
+                <li class="header-list header-button"><a href="index.html">Home</a></li>
+            </ul>
+            
+        </header>
+           
+        <section class="logged_in home-logged-in cover-page">
+            <h1>Download My Word Counter for Android</h1>
+            <a href="assets/app-release.apk" download="MyWordCounterApp" class="gradient-btn">
+                Download
+              </a>
+        </section>
+    </body>
