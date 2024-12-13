@@ -6,7 +6,7 @@ The proposed solution is an android app that will record a child speaking target
 
 This project is being conducted in collaboration with staff from the Department of Speech and Hearing Sciences at UCC.
 
-This repository stores the website application for the project, which can be viewed online at [My Word Counter](http://www.cs.ucc.ie/~sos17/MyWordCounterWeb/).
+This repository stores the website application for the project, which was previously hosted at [My Word Counter](http://www.cs.ucc.ie/~sos17/MyWordCounterWeb/).
 
 The mobile application repository is at [My Word Counter App](https://github.com/Sinead-OSullivan/MyWordCounterApp)
 
